@@ -2,9 +2,9 @@
 Suma Krishnaprasad  
 November 22, 2014  
 
-## =====================================================    
-## Human Activity Recognition Using Smartphones Dataset      
-## =====================================================   
+## ===================================================      
+## Human Activity Recognition Using Smartphones Dataset       
+## ===================================================  
 
 The Files provided by the Human Activity Recognition project by UCI was used for this analysis.
 Refer to [UCI MLR Human Recognition](http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones)
