@@ -1,4 +1,5 @@
 ## set the main path to the working directory
+setwd("~/Desktop/Coursera/UCI HAR Dataset/")
 directory<-setwd("~/Desktop/Coursera/UCI HAR Dataset/")
 
 ## Load the test subjects
@@ -11,44 +12,44 @@ tXvals<-read.table(paste(directory,"/test/X_test.txt",sep=""))
 ## Load the activity labels
 ActLab<-read.table(paste(directory,"/activity_labels.txt",sep=""))
 
-## Merge activity with test subjects
-tActLab<-merge(tYvals,ActLab,by="V1")
-
 ## Combine Subjects, activity and measurements to single data frame
-tSubAct<-data.frame(c(tSub,tActLab,tXvals))
+tSubAct<-cbind(tSub,tYvals,tXvals)
 
 ## Load the training subjects
 rSub<-read.table(paste(directory,"/train/subject_train.txt",sep="")) 
 ## Load the train activities
 rYvals<-read.table(paste(directory,"/train/y_train.txt",sep=""))
-## Merge the training subjects and activities
-rActLab<-merge(rYvals,ActLab,by="V1")
-
 ## load the train measurements
 rXvals<-read.table(paste(directory,"/train/X_train.txt",sep=""))
 
 ## Combine train subjects, activities and measurements to one data frame
-rSubAct<-data.frame(c(rSub,rActLab,rXvals))
+rSubAct<-cbind(rSub,rYvals,rXvals)
 
 ##Merge train and test data sets
 trSubAct<-rbind(tSubAct,rSubAct) 
 
+##Load Features.txt to get column names
+features<-read.table("features.txt")[,2]
+features<-c("Subject","Activity",as.character(features))
+##Give descriptive names to vars
+features <- gsub("^t", "Time", features)
+features <- gsub("^f", "Frequency", features)
+features <- gsub("mean", "Mean", features)
+features <- gsub("std", "StdDev", features)
+features <- gsub("-", "", features)
+features <- gsub("BodyBody", "Body", features)
+features <- gsub("\\(", "", features)
+features <- gsub("\\)", "", features)
+features <- gsub("\\,", "", features)
+
 ## Identify only the mean and std deviation columns
-features<-read.table("features.txt") 
-meanid<-grep("mean",features$V2,fixed=TRUE) 
-meannames<-grep("mean",features$V2,value=TRUE) 
-stdDevid<-grep("std",features$V2,fixed=TRUE) 
-stdDevnames<-grep("std",features$V2,value=TRUE) 
-meanstd<-c(meanid,stdDevid)  
+colnames(trSubAct)<-features
+meanstd <- grep("(Mean|Std)", features)
+trSubAct <- trSubAct[, c(1,2,meanstd)]
 
-## Get a subset of only the mean and stddeviation values
-trSubAct<-data.frame(c(trSubAct[1:3],trSubAct[meanstd+3]))
-
-## assign correct names to the variables
-colnames(trSubAct)<-(c("Subject","Activity","ActivityName",meannames,stdDevnames)) 
-
+library(plyr)
 ## Aggregate the average of mean and std dev values by subject and activity
-traSubAct<-aggregate(trSubAct[,4:82], by=list(subject=trSubAct$Subject,activity=trSubAct$Activity),  FUN=mean)
+traSubAct<-ddply(trSubAct, c("Subject","Activity"), function(x) colMeans(x[,c(3:88)]))
 
 ##Write the final results to a tidydataset text file
 write.table(traSubAct,"tidydataset.txt",sep=";",row.name=FALSE)
