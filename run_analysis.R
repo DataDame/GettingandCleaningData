@@ -50,8 +50,10 @@ trSubAct <- trSubAct[, c(1,2,meanstd)]
 library(plyr)
 ## Aggregate the average of mean and std dev values by subject and activity
 traSubAct<-ddply(trSubAct, c("Subject","Activity"), function(x) colMeans(x[,c(3:88)]))
+##Add descriptive names to activity
+traSubAct$Activity<- factor(traSubAct$Activity, labels = ActLab$V2)
 
 ##Write the final results to a tidydataset text file
 write.table(traSubAct,"tidydataset.txt",sep=";",row.name=FALSE)
 
-col<-data.frame(colnames(traSubAct))
+
