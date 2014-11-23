@@ -54,4 +54,4 @@ traSubAct<-ddply(trSubAct, c("Subject","Activity"), function(x) colMeans(x[,c(3:
 ##Write the final results to a tidydataset text file
 write.table(traSubAct,"tidydataset.txt",sep=";",row.name=FALSE)
 
-
+col<-data.frame(colnames(traSubAct))
